@@ -1,0 +1,16 @@
+#ifndef _DRAW_H_
+#define _DRAW_H_
+
+#include <SFML/Graphics.hpp>
+
+const size_t Buffer = 100;
+
+//==================================================================================================
+
+void DrawImage (sf::RenderWindow *window, const sf::Image *img);
+
+void PrintFPS (sf::RenderWindow *window, sf::Clock *fps_time, size_t *frame_cnt);
+
+//==================================================================================================
+
+#endif

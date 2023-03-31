@@ -34,9 +34,9 @@ enum Log_errors
         Process_error_ (#error, error, LOG_ARGS, __VA_ARGS__)                              
 
 
-int Open_logs_file ();
+int OpenLogsFile ();
 
-int Close_logs_file ();
+int CloseLogsFile ();
 
 FILE *Get_log_file_ptr ();
 

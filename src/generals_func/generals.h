@@ -14,8 +14,6 @@
 #define MIN(a, b) ((a) < (b) ? (а) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-#define INIT_BUFFER 100
-
 /**
  * @def is_error
  * @brief Checks for false input conditions
@@ -37,6 +35,7 @@ static const long double Eps = 1e-10; ///< Global constant equal to \f$\ 10^{-9}
 
 static const int Inf = 1e9+7; 
 
+static const int Init_buffer = 100;
 
 /**
  * @enum Errors
@@ -85,19 +84,19 @@ struct Options{
     bool info_option    = 0;
 };
 
-inline bool Check_nullptr  (void *ptr)
+inline bool CheckNullptr  (void *ptr)
 {
 	return (ptr == nullptr);
 }
 
-int inline Dump_func (int val)
+inline int Dump_func (int val)
 {
     return val;
 }
 
-void My_flush ();
+void MyFlush ();
 
-bool Check_num (const char *str);
+bool CheckNum (const char *str);
 
 /** 
  * @brief Comparison of double variables
@@ -106,7 +105,7 @@ bool Check_num (const char *str);
  * @param [in] num2 input double parameter
  * @return False - number is not equal, true - number is equal
 */
-bool Equality_double (double num1, double num2);
+bool EqualityDouble (double num1, double num2);
 
 /** 
  * @brief Comparing a number to zero
@@ -114,7 +113,7 @@ bool Equality_double (double num1, double num2);
  * @param [in] n input parameter
  * @return False - number is not zero, true - number is zero
 */
-bool Is_zero (double num);
+bool IsZero (double num);
 
 /** 
  * @brief Correct zero value
@@ -123,15 +122,14 @@ bool Is_zero (double num);
  * @note If the value is zero the program must not return -0.00
  * @return Returns zero if the number is zero, otherwise returns the number itself
 */
-double Fix_zero (double num);
+double FixZero (double num);
 
-int Bin_represent (FILE *fpout, size_t elem, uint64_t size_elem);
+int BinRepresent (FILE *fpout, size_t elem, uint64_t size_elem);
 
-int Clear_data (unsigned char *cmd_hash_tabel, size_t size_data);
+int ClearData (unsigned char *cmd_hash_tabel, size_t size_data);
 
-uint64_t Get_data_hash (const char *data, uint64_t len);
+uint64_t GetDataHash (const char *data, uint64_t len);
 
-int64_t Get_str_hash (const char *str);
 
 /** 
  * @brief Paints a line
@@ -139,25 +137,8 @@ int64_t Get_str_hash (const char *str);
  * @param [in] colour colour you want to paint a string
  * @param [in] str line to be colored
 */
-void Print_colour (char const colour[], char const *str, ...);
+void PrintColour (char const colour[], char const *str, ...);
 
-/** 
- * @brief Parsing comon line
- * @version 1.0.0
- * @param [in] argc argument count
- * @param [in] argv argument values
- * @param [in] Struct option, which we want to use
- * @return Return zero, if program worked correctly
-*/
-int Parsing (int argc, const char *argv[], Options *option);
-
-/** 
- * @brief Process options
- * @version 1.0.0
- * @param [in] Struct option, which we want to use
- * @return Return zero, if program worked correctly
-*/
-int Process_parsing (Options *options);
 
 /**
  * @brief Opens a file in a specific mode
@@ -165,27 +146,18 @@ int Process_parsing (Options *options);
  * @param [in] mode Open file access modes
  * @return Pointer on file 
  */
-FILE *Open_file_ptr (const char *name_file, const char *mode);
+FILE *OpenFilePtr (const char *name_file, const char *mode);
 
 /**
  * @brief Close a file
  * @param [in] fp Pointer of file 
  * @return Zero - if closing happened without error 
  */
-char Close_file_ptr (FILE *fp);
+char CloseFilePtr (FILE *fp);
 
-/**
- * @brief Creat empty file
- * If file exist, clear it
- * @param [in] name_file Name of file 
- * @param [in] mode Open file access modes
- * @return Pointer on file 
- */
-int Creat_empty_file (const char *name_file);
+int OpenFileDescriptor (const char *name_file, const int mode);
 
-int Open_file_discriptor (const char *name_file, const int mode);
-
-char Close_file_discriptor (int fd);
+char CloseFileDescriptor (int fd);
 
 /**
  * @brief Swaps the values of variables
@@ -194,14 +166,14 @@ char Close_file_discriptor (int fd);
  * @param size_type [in] size of variables in bytes
  * @return Returns zero if the variables have changed values 
  */
-int My_swap (void *obj1, void *obj2, size_t size_type);
+int MySwap (void *obj1, void *obj2, size_t size_type);
 
-char* My_strndup (const char *str, const int len);
+char* MyStrndub (const char *str, const int len);
 
 int Factorial (int ord);
 
-char* Create_virtual_buf (const int fdin, const size_t offset);
+char* CreateVirtualBuf (const int fdin, const size_t offset);
 
-int Free_virtual_buf (const int fdin, char *virtual_buf);
+int FreeVirtualBuf (const int fdin, char *virtual_buf);
 
 #endif

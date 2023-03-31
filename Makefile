@@ -1,4 +1,4 @@
-all: mkdirectory run 
+all: mkdirectory run optimization
 
 FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations 		\
 		-Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion	\
@@ -9,24 +9,31 @@ FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equa
 SFML_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 
-run: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o
-	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o -o run $(SFML_FLAGS)
+run: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
+	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run $(SFML_FLAGS)
+
+optimization: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
+	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o optimization -o2 $(SFML_FLAGS)
 
 
 obj/main.o: main.cpp
 		g++ main.cpp -c -o obj/main.o $(FLAGS)
 
 
-obj/mandelbrot.o: mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h 
-		g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o $(FLAGS)
-
+obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp  
+				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o $(FLAGS)
 
 
 obj/log_errors.o: src/log_info/log_errors.h src/log_info/log_errors.cpp
 			  g++ src/log_info/log_errors.cpp -c -o obj/log_errors.o $(FLAGS)
 
-obj/generals.o: src/Generals_func/generals.cpp
-			g++ src/Generals_func/generals.cpp -c -o obj/generals.o $(FLAGS)
+obj/generals.o: src/generals_func/generals.cpp src/generals_func/generals.h
+			g++ src/generals_func/generals.cpp -c -o obj/generals.o $(FLAGS)
+
+
+obj/draw.o: src/draw/draw.cpp src/draw/draw.h
+		g++ src/draw/draw.cpp -c -o obj/draw.o $(FLAGS)
+
 
 .PHONY: cleanup mkdirectory
 

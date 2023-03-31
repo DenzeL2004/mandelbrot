@@ -2,3 +2,6 @@ run
 *.o
 test.cpp
 .vscode/tasks.json
+README.md
+optimization
+temp/log_info.html

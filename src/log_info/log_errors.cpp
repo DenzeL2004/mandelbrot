@@ -3,15 +3,15 @@
 #include <stdarg.h>
 
 #include "log_errors.h"
-#include "../Generals_func/generals.h"
+#include "../generals_func/generals.h"
 
 static FILE *fp_logs = nullptr;
 
 //=======================================================================================================
 
-int Open_logs_file ()
+int OpenLogsFile ()
 {    
-    fp_logs = Open_file_ptr ("temp/log_info.html", "a");
+    fp_logs = OpenFilePtr ("temp/log_info.html", "a");
 
     if (!fp_logs)
     {
@@ -133,14 +133,14 @@ FILE *Get_log_file_ptr ()
 
 //=======================================================================================================
 
-int Close_logs_file ()
+int CloseLogsFile ()
 {
     time_t seconds = time (NULL)  + 3 * 60* 60;;   
 
     fprintf (fp_logs, "\n----------------------------------------------------\n");
     fprintf (fp_logs, "Time close logs file: %s\n\n", asctime(gmtime(&seconds)));
     
-    if (Close_file_ptr (fp_logs))
+    if (CloseFilePtr (fp_logs))
     {
         fprintf (stderr, "Logs file does not close\n");
         return ERR_FILE_OPEN;

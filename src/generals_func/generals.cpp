@@ -18,7 +18,7 @@
 
 //======================================================================================
 
-bool Check_num (const char *str)
+bool CheckNum (const char *str)
 {
 	assert (str != nullptr && "str is nullptr");
 
@@ -36,7 +36,7 @@ bool Check_num (const char *str)
 
 //======================================================================================
 
-void My_flush ()
+void MyFlush ()
 {
 	char ch = 0;
 	while ((ch = (char)getchar()) != EOF && ch != '\n')
@@ -45,36 +45,36 @@ void My_flush ()
 
 //======================================================================================
 
-bool Equality_double (double num1, double num2){
+bool EqualityDouble (double num1, double num2){
     is_error (isfinite (num1));
     is_error (isfinite (num2));
 
     return fabs (num1-num2) < Eps;
 }
 
-bool Is_zero (double num){
+bool IsZero (double num){
     is_error (isfinite (num));
 
-    return Equality_double (num, 0);
+    return EqualityDouble (num, 0);
 }
 
 //======================================================================================
 
-double Fix_zero (double num){
+double FixZero (double num){
     is_error (isfinite (num));
 
-    if (Is_zero (num))
+    if (IsZero (num))
         return 0.0;
     return num;
 }
 
 //======================================================================================
 
-int Clear_data (unsigned char *cmd_hash_tabel, size_t size_data)
+int ClearData (unsigned char *cmd_hash_tabel, size_t size_data)
 {
     assert (cmd_hash_tabel != nullptr && "cmd_hash_tabel is nullptr");
 
-    for (int ip = 0; ip < size_data; ip++)
+    for (size_t ip = 0; ip < size_data; ++ip)
         cmd_hash_tabel[ip] = 0;
 
     return 0;
@@ -82,7 +82,7 @@ int Clear_data (unsigned char *cmd_hash_tabel, size_t size_data)
 
 //======================================================================================
 
-int Bin_represent(FILE *fpout, size_t elem, uint64_t size_elem)
+int BinRepresent(FILE *fpout, size_t elem, uint64_t size_elem)
 {
 	assert (fpout != nullptr && "fpot is nullptr");
 	
@@ -95,7 +95,7 @@ int Bin_represent(FILE *fpout, size_t elem, uint64_t size_elem)
 
 //======================================================================================
 
-uint64_t Get_data_hash (const char *data, uint64_t len) 
+uint64_t GetDataHash (const char *data, uint64_t len) 
 {
 	assert (data != nullptr && "data is nullptr");
 
@@ -117,31 +117,7 @@ uint64_t Get_data_hash (const char *data, uint64_t len)
 
 //======================================================================================
 
-int64_t Get_str_hash (const char *str) 
-{
-    assert (str != nullptr && "str is nullptr");
-    
-    const int prime_num = 239017, mod = 1e9+7;
-
-    int64_t hash = 0, degree = 1;
-    int ip = 0;
-
-    while (*(str + ip) != '\0') 
-    {
-        unsigned char ch = (unsigned char) tolower(*(str + ip));
-        
-        hash = (hash + degree * ch) % mod;
-        degree = (degree * prime_num) % mod;
-
-        ip++;
-    }
-
-    return hash; 
-}
-
-//======================================================================================
-
-void Print_colour (char const colour[], char const *str, ...){
+void PrintColour (char const colour[], char const *str, ...){
     printf ("%s", colour);
 
     va_list arg_ptr;
@@ -155,7 +131,7 @@ void Print_colour (char const colour[], char const *str, ...){
 
 //======================================================================================
 
-FILE *Open_file_ptr (const char *name_file, const char *mode)
+FILE *OpenFilePtr (const char *name_file, const char *mode)
 {
 	assert (name_file != nullptr && "name open file is nullptr");
 	assert (mode != nullptr && "specifier mod open file is nullptr");
@@ -174,7 +150,8 @@ FILE *Open_file_ptr (const char *name_file, const char *mode)
 
 //======================================================================================
 
-char Close_file_ptr (FILE *fp){
+char CloseFilePtr (FILE *fp)
+{
 	assert (fp != nullptr && "FILE is nullptr");
 
 	if (fclose(fp)){
@@ -187,7 +164,8 @@ char Close_file_ptr (FILE *fp){
 
 //======================================================================================
 
-int Open_file_discriptor (const char *name_file, const int mode){
+int OpenFileDescriptor (const char *name_file, const int mode)
+{
 	assert (name_file != nullptr && "name open file is nullptr");
 
 	int fd = open (name_file, mode);
@@ -204,7 +182,8 @@ int Open_file_discriptor (const char *name_file, const int mode){
 
 //======================================================================================
 
-char Close_file_discriptor (int fd){
+char CloseFileDescriptor (int fd)
+{
 	assert (fd  >= 0 && "discriptor is a negative number");
 
 	if (close(fd)){
@@ -217,7 +196,8 @@ char Close_file_discriptor (int fd){
 
 //======================================================================================
 
-int My_swap (void *obj1, void *obj2, size_t size_type){                         
+int MySwap (void *obj1, void *obj2, size_t size_type)
+{                         
     assert (obj1 != NULL && "obj1 is NULL");
 	assert (obj2 != NULL && "obj2 is NULL");
 
@@ -274,14 +254,14 @@ int My_swap (void *obj1, void *obj2, size_t size_type){
 
 //======================================================================================
 
-char* My_strndup (const char *str, const int len)
+char* MyStrndub (const char *str, const int len)
 {
 	assert (str != nullptr && "str is nullptr");
 	assert (len > 0 && "len is not positive number");
 
 	char *dup = (char*) calloc (len + 1, sizeof (char));
 
-	if (!Check_nullptr (dup))
+	if (!CheckNullptr (dup))
 		dup = strncpy (dup, str, len);
 
 	return dup;
@@ -302,7 +282,7 @@ int Factorial (int ord)
 
 //========================================================================================
 
-char* Create_virtual_buf (const int fdin, const size_t offset)
+char* CreateVirtualBuf (const int fdin, const size_t offset)
 {
     assert (fdin > 0 && "file name is nullptr");   
 
@@ -324,7 +304,7 @@ char* Create_virtual_buf (const int fdin, const size_t offset)
 
 //========================================================================================
 
-int Free_virtual_buf (const int fdin, char *virtual_buf)
+int FreeVirtualBuf (const int fdin, char *virtual_buf)
 {
     assert (virtual_buf != nullptr && "virtual_buf is nullptr");
     assert (fdin > 0 && "file name is nullptr");   
