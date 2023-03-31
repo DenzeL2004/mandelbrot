@@ -1,0 +1,4 @@
+run
+*.o
+test.cpp
+.vscode/tasks.json
