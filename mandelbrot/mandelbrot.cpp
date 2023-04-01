@@ -147,11 +147,12 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 
     const __m256 Rmax2_  = _mm256_set1_ps(Rmax * Rmax);
     const __m256 Delta_  = _mm256_set1_ps(delta);
-    const __m256 It_     = _mm256_set_ps (0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f);
+    const __m256 It_     = _mm256_set_ps (0        ,     delta, 2 * delta, 3 * delta, 
+                                          4 * delta, 5 * delta, 6 * delta, 7 * delta);
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
-        __m256 x0_ =_mm256_add_ps(_mm256_set1_ps(start_x), _mm256_mul_ps(It_, Delta_)); 
+        __m256 x0_ = _mm256_add_ps(_mm256_set1_ps(start_x), It_); 
 		__m256 y0_ = _mm256_set1_ps(start_y + ((float)yi) * delta); 
 
         for (uint32_t xi = 0; xi < mandelbrot_struct->width; xi += 8) 
@@ -180,7 +181,7 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
                 y_ = _mm256_add_ps(_mm256_add_ps(xy_, xy_), y0_);
             }
 
-            cnt_ = _mm256_sub_epi32(_mm256_set1_epi32(Counter_limit), cnt_);
+            cnt_ = _mm256_sub_epi32(_mm256_set1_epi32(255), cnt_);
 
             int cnt[8] = {0};
             _mm256_storeu_si256((__m256i*)cnt, cnt_);

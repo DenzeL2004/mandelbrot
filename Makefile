@@ -10,7 +10,7 @@ SFML_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 
 run: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
-	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run -o2 -mavx2 $(SFML_FLAGS)
+	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run -O2 -mavx2 $(SFML_FLAGS)
 
 
 obj/main.o: main.cpp
