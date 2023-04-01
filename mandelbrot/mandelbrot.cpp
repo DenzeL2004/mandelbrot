@@ -147,8 +147,8 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 
     const __m256 Rmax2_  = _mm256_set1_ps(Rmax * Rmax);
     const __m256 Delta_  = _mm256_set1_ps(delta);
-    const __m256 It_     = _mm256_set_ps (0        ,     delta, 2 * delta, 3 * delta, 
-                                          4 * delta, 5 * delta, 6 * delta, 7 * delta);
+    const __m256 It_     = _mm256_set_ps (7 * delta, 6 * delta, 5 * delta, 4 * delta, 
+                                          3 * delta, 2 * delta,     delta, 0);
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
