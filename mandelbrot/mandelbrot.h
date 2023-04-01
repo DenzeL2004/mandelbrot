@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include <immintrin.h>
+
 //===============================================================================
 
-const float Rmax = 4.0f;             
+const float Rmax = 2.0f;             
 
 const size_t Counter_limit = 255;
 
@@ -15,8 +17,8 @@ const float Init_start_y = -1.f;
 
 const float Init_delta   = 0.0025f;
 
-const float Steep_coord  = 0.05f;
-const float Steep_delta  = 0.00025f;
+const float Step_coord  = 0.05f;
+const float Step_delta  = 0.00025f;
 
 
 const uint32_t Window_hight  = 800;

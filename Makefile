@@ -10,10 +10,7 @@ SFML_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 
 run: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
-	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run $(SFML_FLAGS)
-
-optimization: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
-	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o optimization -o2 $(SFML_FLAGS)
+	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run -o2 -mavx2 $(SFML_FLAGS)
 
 
 obj/main.o: main.cpp
@@ -21,7 +18,7 @@ obj/main.o: main.cpp
 
 
 obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp  
-				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o $(FLAGS)
+				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o -msse4 -march=native $(FLAGS)
 
 
 obj/log_errors.o: src/log_info/log_errors.h src/log_info/log_errors.cpp

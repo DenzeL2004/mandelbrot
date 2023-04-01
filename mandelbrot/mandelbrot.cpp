@@ -3,17 +3,13 @@
 
 #include <assert.h>
 #include <unistd.h>
+#include <immintrin.h>
 
 #include "../src/log_info/log_errors.h"
 #include "../src/generals_func/generals.h"
 #include "../src/draw/draw.h"
 
 #include "mandelbrot.h"
-
-
-const uint8_t Green_cf  = 20;
-const uint8_t Blue_cf   = 0;
-const uint8_t Red_cf    = 25;
 
 
 //==============================================================================
@@ -56,16 +52,16 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
         if (flag_draw_img)
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                mandelbrot_struct->start_y += -Steep_coord;
+                mandelbrot_struct->start_y += -Step_coord;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                mandelbrot_struct->start_y += Steep_coord;    
+                mandelbrot_struct->start_y += Step_coord;    
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                mandelbrot_struct->start_x += -Steep_coord;
+                mandelbrot_struct->start_x += -Step_coord;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                mandelbrot_struct->start_x += Steep_coord;  
+                mandelbrot_struct->start_x += Step_coord;  
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
                 NewCoord(mandelbrot_struct, ZOOM);
@@ -145,33 +141,57 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 {
     assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
 
+    float start_x = mandelbrot_struct->start_x;
+    float start_y = mandelbrot_struct->start_y;
+    float delta   = mandelbrot_struct->delta;
+
+    const __m256 Rmax2_  = _mm256_set1_ps(Rmax * Rmax);
+    const __m256 Delta_  = _mm256_set1_ps(delta);
+    const __m256 It_     = _mm256_set_ps (0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f);
+
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
-        for (uint32_t xi = 0; xi < mandelbrot_struct->width; xi++) 
+        __m256 x0_ =_mm256_add_ps(_mm256_set1_ps(start_x), _mm256_mul_ps(It_, Delta_)); 
+		__m256 y0_ = _mm256_set1_ps(start_y + ((float)yi) * delta); 
+
+        for (uint32_t xi = 0; xi < mandelbrot_struct->width; xi += 8) 
         {
-			float x0 = mandelbrot_struct->start_x + ((float)xi) * mandelbrot_struct->delta;
-			float y0 = mandelbrot_struct->start_y + ((float)yi) * mandelbrot_struct->delta;
-
-            float x  = x0;
-            float y  = y0;
+            __m256 x_  = x0_;
+            __m256 y_  = y0_;
             
-            size_t cnt = 0;
+            __m256i cnt_ = _mm256_set1_epi32(Counter_limit);
 
-            for (; cnt < Counter_limit; cnt++) 
+            for (uint32_t cnt = 0; cnt < Counter_limit; cnt++) 
             {
-                float x2 = x * x;
-                float y2 = y * y;
+                __m256 x2_ = _mm256_mul_ps(x_, x_);
+                __m256 y2_ = _mm256_mul_ps(y_, y_);
 
-                float mul_xy = x * y;
+                __m256 xy_ = _mm256_mul_ps(x_, y_);
 
-                if (x2 + y2 > Rmax) break;
+                __m256 r2_  = _mm256_add_ps(x2_, y2_);
 
-                x = x2 - y2     + x0;
-                y = 2  * mul_xy + y0;
+                __m256 cmp_ = _mm256_cmp_ps(r2_, Rmax2_, _CMP_LT_OQ);
+                int mask = _mm256_movemask_ps(cmp_);
+                if (!mask) break;
+                
+                cnt_ = _mm256_sub_epi32(cnt_, _mm256_castps_si256(cmp_));
+
+                x_ = _mm256_add_ps(_mm256_sub_ps(x2_, y2_), x0_);
+                y_ = _mm256_add_ps(_mm256_add_ps(xy_, xy_), y0_);
             }
 
-            size_t id = yi * mandelbrot_struct->width + xi;
-            *(mandelbrot_struct->exit_num + id) = cnt;
+            cnt_ = _mm256_sub_epi32(_mm256_set1_epi32(Counter_limit), cnt_);
+
+            int cnt[8] = {0};
+            _mm256_storeu_si256((__m256i*)cnt, cnt_);
+
+            for (uint32_t id = 0; id < 8; id++) 
+            {
+                uint32_t pos = yi * mandelbrot_struct->width + xi + id;
+                mandelbrot_struct->exit_num[pos] = cnt[id];
+            }
+
+            x0_= _mm256_add_ps(x0_, _mm256_mul_ps(Delta_, _mm256_set1_ps(8)));
         }
     }
 
@@ -184,6 +204,10 @@ static void MandelbrotGetImage (const Mandelbrot_struct *mandelbrot_struct, sf::
 {
     assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
     assert(img               != nullptr && "img is nullptr");
+
+    const uint8_t Green_cf  = 20;
+    const uint8_t Blue_cf   = 0;
+    const uint8_t Red_cf    = 25;
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
@@ -221,9 +245,9 @@ static void NewCoord (Mandelbrot_struct *mandelbrot_struct, const int mode)
     if (mode == UNZOOM && IsZero(mandelbrot_struct->delta))
         dir = -1.f;
 
-    mandelbrot_struct->delta   +=      -Steep_delta * dir;
-    mandelbrot_struct->start_x += 3.f * Steep_coord * dir;
-    mandelbrot_struct->start_y += 2.f * Steep_coord * dir;
+    mandelbrot_struct->delta   +=      -Step_delta  * dir;
+    mandelbrot_struct->start_x += 3.f * Step_coord * dir;
+    mandelbrot_struct->start_y += 2.f * Step_coord * dir;
 	
     return;
 }
