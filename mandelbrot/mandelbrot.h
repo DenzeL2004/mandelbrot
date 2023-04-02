@@ -55,7 +55,7 @@ struct Mandelbrot_struct
 
     float delta   = Init_delta;
 
-    size_t *exit_num = nullptr;
+    int *exit_num = nullptr;
 };
 
 //===============================================================================

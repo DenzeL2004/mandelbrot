@@ -108,7 +108,7 @@ int MandelbrotCtor (Mandelbrot_struct *mandelbrot_struct,
 
     mandelbrot_struct->delta   = delta;
 
-    mandelbrot_struct->exit_num = (size_t*) calloc (hight * width, sizeof(size_t));
+    mandelbrot_struct->exit_num = (int*) calloc (hight * width, sizeof(int));
     if (CheckNullptr(mandelbrot_struct->exit_num))
         return PROCESS_ERROR(MANDELBROT_CTOR_ERR, "struct ctor failed\n");
 
@@ -183,14 +183,8 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 
             cnt_ = _mm256_sub_epi32(_mm256_set1_epi32(255), cnt_);
 
-            int cnt[8] = {0};
-            _mm256_storeu_si256((__m256i*)cnt, cnt_);
-
-            for (uint32_t id = 0; id < 8; id++) 
-            {
-                uint32_t pos = yi * mandelbrot_struct->width + xi + id;
-                mandelbrot_struct->exit_num[pos] = cnt[id];
-            }
+            uint32_t id = yi * mandelbrot_struct->width + xi;
+            _mm256_storeu_si256((__m256i*)(mandelbrot_struct->exit_num + id), cnt_);
 
             x0_= _mm256_add_ps(x0_, _mm256_mul_ps(Delta_, _mm256_set1_ps(8)));
         }
