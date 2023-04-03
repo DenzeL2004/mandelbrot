@@ -4,3 +4,4 @@ test.cpp
 .vscode/tasks.json
 optimization
 temp/log_info.html
+.vscode/settings.json

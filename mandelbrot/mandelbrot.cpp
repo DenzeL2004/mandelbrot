@@ -51,17 +51,19 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
 
         if (flag_draw_img)
         {
+            float scale_cf = mandelbrot_struct->delta * 10;
+
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                mandelbrot_struct->start_y += -Step_coord;
+                mandelbrot_struct->start_y += -scale_cf;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                mandelbrot_struct->start_y += Step_coord;    
+                mandelbrot_struct->start_y += scale_cf;    
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                mandelbrot_struct->start_x += -Step_coord;
+                mandelbrot_struct->start_x += -scale_cf;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                mandelbrot_struct->start_x += Step_coord;  
+                mandelbrot_struct->start_x += scale_cf;  
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
                 NewCoord(mandelbrot_struct, ZOOM);
@@ -181,7 +183,7 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
                 y_ = _mm256_add_ps(_mm256_add_ps(xy_, xy_), y0_);
             }
 
-            cnt_ = _mm256_sub_epi32(_mm256_set1_epi32(255), cnt_);
+            cnt_ = _mm256_sub_epi32(cnt_, _mm256_set1_epi32(255));
 
             uint32_t id = yi * mandelbrot_struct->width + xi;
             _mm256_storeu_si256((__m256i*)(mandelbrot_struct->exit_num + id), cnt_);
@@ -200,21 +202,29 @@ static void MandelbrotGetImage (const Mandelbrot_struct *mandelbrot_struct, sf::
     assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
     assert(img               != nullptr && "img is nullptr");
 
-    const uint8_t Green_cf  = 20;
-    const uint8_t Blue_cf   = 0;
-    const uint8_t Red_cf    = 25;
+    const uint8_t Red_cf    = 8;
+    const uint8_t Green_cf  = 4;
+    const uint8_t Blue_cf   = 4;
+    
+    const uint8_t Red_offset    = 16;
+    const uint8_t Green_offset  = 4;
+    const uint8_t Blue_offset   = 8;
+    
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
         for (uint32_t  xi = 0; xi < mandelbrot_struct->width; xi++) 
         {
             uint32_t id = yi * mandelbrot_struct->width + xi;
-            size_t cnt = *(mandelbrot_struct->exit_num + id);
+            int cnt = *(mandelbrot_struct->exit_num + id);
 
             if (cnt == Counter_limit)
                 img->setPixel(xi, yi, sf::Color::Black);
             else
-                img->setPixel(xi, yi, sf::Color(Red_cf * cnt, Green_cf * cnt, Blue_cf * cnt));
+                img->setPixel(xi, yi, sf::Color((uint8_t)(Red_cf   * cnt + Red_offset), 
+                                                (uint8_t)(Green_cf * cnt + Green_offset), 
+                                                (uint8_t)(Blue_cf  * cnt + Blue_offset)));
+
         }
     }
 
@@ -229,6 +239,8 @@ static void NewCoord (Mandelbrot_struct *mandelbrot_struct, const int mode)
 
     float dir = 0.f;
 
+    float scale_cf  = mandelbrot_struct->delta * Scale_delta;
+
     if (mandelbrot_struct->delta > 0 && !IsZero(mandelbrot_struct->delta))
     {
         if (mode == ZOOM)   dir =  1.f;
@@ -240,9 +252,9 @@ static void NewCoord (Mandelbrot_struct *mandelbrot_struct, const int mode)
     if (mode == UNZOOM && IsZero(mandelbrot_struct->delta))
         dir = -1.f;
 
-    mandelbrot_struct->delta   +=      -Step_delta  * dir;
-    mandelbrot_struct->start_x += 3.f * Step_coord * dir;
-    mandelbrot_struct->start_y += 2.f * Step_coord * dir;
+    mandelbrot_struct->delta   +=      -scale_cf * dir;
+    mandelbrot_struct->start_x +=       scale_cf * dir;
+    mandelbrot_struct->start_y +=       scale_cf * dir;
 	
     return;
 }

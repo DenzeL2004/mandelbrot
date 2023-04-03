@@ -17,8 +17,8 @@ const float Init_start_y = -1.f;
 
 const float Init_delta   = 0.0025f;
 
-const float Step_coord  = 0.05f;
-const float Step_delta  = 0.00025f;
+const float Step_coord  = 0.01f;
+const float Scale_delta = 0.02f;
 
 
 const uint32_t Window_hight  = 800;

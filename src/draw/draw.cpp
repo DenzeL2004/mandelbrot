@@ -41,7 +41,7 @@ void PrintFPS (sf::RenderWindow *window, sf::Clock *fps_time, size_t *frame_cnt)
 
 
     char buf[Buffer] = {0};
-    sprintf(buf, "%.2f", fps);
+    sprintf(buf, "%.2f FPS", fps);
     
     (*window).setTitle(buf);
 
