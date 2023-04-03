@@ -18,7 +18,7 @@ obj/main.o: main.cpp
 
 
 obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp  
-				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o -O2 -mavx2 -msse4 -march=native $(FLAGS)
+				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o -O2 -mavx2 -msse4 $(FLAGS)
 
 
 obj/log_errors.o: src/log_info/log_errors.h src/log_info/log_errors.cpp
