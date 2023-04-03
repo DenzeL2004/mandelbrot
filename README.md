@@ -16,10 +16,11 @@
 
 ## Управление
 
-Arrow Up    - moving picture up
-Arrow Down  - moving picture down
-Arrow Left  - moving picture left
-Arrow Right - moving picture right
+Стрелка Вверх  - передвигает картинку вверх
+Стрелка Вниз   - передвигает картинку вниз
+Стрелка Влево  - передвигает картинку влево
+Стрелка Вправо - передвигает картинку вправо
 
-Key A - picture zoom
-Key S - picture unzoom
+Клавиша A - приближение картинки
+Клавиша S - отдаление картинки
+Клавиша P - отключение отрисовки картинки

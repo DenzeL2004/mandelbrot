@@ -14,10 +14,9 @@
 
 //==============================================================================
 
-static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct, sf::Image *img);
+static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct);
 
-
-static sf::Color GetColor (const int num);
+static void MandelbrotGetImage (const Mandelbrot_struct *mandelbrot_struct, sf::Image *img);
 
 
 static void MoveCoord (Mandelbrot_struct *mandelbrot_struct, const int mode);
@@ -72,16 +71,15 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
                 MoveCoord(mandelbrot_struct, ZOOM);
                 
-
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
                 MoveCoord(mandelbrot_struct, UNZOOM);
         }
 
-        MandelbrotCalc(mandelbrot_struct, &mandelbrot_img); 
+        MandelbrotCalc(mandelbrot_struct); 
 
         if (flag_draw_img)
         {
-            //MandelbrotGetImage(mandelbrot_struct, &mandelbrot_img);
+            MandelbrotGetImage(mandelbrot_struct, &mandelbrot_img);
             DrawImage(&window, &mandelbrot_img);
         }
         else
@@ -143,7 +141,7 @@ int MandelbrotDtor (Mandelbrot_struct *mandelbrot_struct)
 
 //===============================================================================
 
-static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct, sf::Image *img)
+static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 {
     assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
 
@@ -154,9 +152,7 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct, sf::Image *img
     const __m256 Rmax2_  = _mm256_set1_ps(Rmax * Rmax);
     const __m256 Delta_  = _mm256_set1_ps(delta);
     const __m256 It_     = _mm256_set_ps (7 * delta, 6 * delta, 5 * delta, 4 * delta, 
-                                          3 * delta, 2 * delta,     delta, 0);
-
-    int num[8] = {0};
+                                          3 * delta, 2 * delta, 1 *  delta, 0);
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
@@ -190,13 +186,10 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct, sf::Image *img
                 y_ = _mm256_add_ps(_mm256_add_ps(xy_, xy_), y0_);
             }
 
-            cnt_ = _mm256_sub_epi32(cnt_, _mm256_set1_epi32(Counter_limit));
-            _mm256_storeu_si256((__m256i*)(num), cnt_);
+            cnt_ = _mm256_sub_epi32(cnt_, _mm256_set1_epi32(255));
 
-            for (uint32_t id = 0; id < 8; id++) 
-            {
-                img->setPixel(xi + id, yi, GetColor(num[id]));
-            }
+            uint32_t id = yi * mandelbrot_struct->width + xi;
+            _mm256_storeu_si256((__m256i*)(mandelbrot_struct->exit_num + id), cnt_);
 
             x0_= _mm256_add_ps(x0_, _mm256_mul_ps(Delta_, _mm256_set1_ps(8)));
         }
@@ -205,12 +198,13 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct, sf::Image *img
     return;
 }
 
-
-
 //===============================================================================
 
-static sf::Color GetColor (const int num)
+static void MandelbrotGetImage (const Mandelbrot_struct *mandelbrot_struct, sf::Image *img)
 {
+    assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
+    assert(img               != nullptr && "img is nullptr");
+
     const uint8_t Red_cf    = 10;
     const uint8_t Green_cf  = 4;
     const uint8_t Blue_cf   = 4;
@@ -220,14 +214,24 @@ static sf::Color GetColor (const int num)
     const uint8_t Blue_offset   = 24;
     
 
+	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
+    {
+        for (uint32_t  xi = 0; xi < mandelbrot_struct->width; xi++) 
+        {
+            uint32_t id = yi * mandelbrot_struct->width + xi;
+            int cnt = *(mandelbrot_struct->exit_num + id);
 
-    if (num != Counter_limit)
-        return sf::Color((uint8_t)(Red_cf   * num + Red_offset), 
-                         (uint8_t)(Green_cf * num + Green_offset), 
-                         (uint8_t)(Blue_cf  * num + Blue_offset));
+            if (cnt == Counter_limit)
+                img->setPixel(xi, yi, sf::Color::Black);
+            else
+                img->setPixel(xi, yi, sf::Color((uint8_t)(Red_cf   * cnt + Red_offset), 
+                                                (uint8_t)(Green_cf * cnt + Green_offset), 
+                                                (uint8_t)(Blue_cf  * cnt + Blue_offset)));
 
+        }
+    }
 
-    return sf::Color::Black;
+    return;
 }
 
 //===============================================================================
