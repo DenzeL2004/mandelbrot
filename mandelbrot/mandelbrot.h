@@ -8,7 +8,7 @@
 
 //===============================================================================
 
-const float Rmax = 2.0f;             
+const float Rmax = 5.0f;             
 
 const size_t Counter_limit = 255;
 
@@ -17,12 +17,16 @@ const float Init_start_y = -1.f;
 
 const float Init_delta   = 0.0025f;
 
-const float Step_coord  = 0.01f;
+const float Scale_coord = 10.f;
 const float Scale_delta = 0.02f;
 
 
 const uint32_t Window_hight  = 800;
 const uint32_t Window_width  = 1200;
+
+//===============================================================================
+
+const useconds_t Delay = 100000;
 
 //===============================================================================
 
