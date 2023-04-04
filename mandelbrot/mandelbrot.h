@@ -24,6 +24,8 @@ const float Scale_delta = 0.02f;
 const uint32_t Window_hight  = 800;
 const uint32_t Window_width  = 1200;
 
+const size_t   Accuracy = 100;
+
 //===============================================================================
 
 const useconds_t Delay = 100000;

@@ -54,19 +54,19 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
         
         if (flag_draw_img)
         {
-            float scale_cf = mandelbrot_struct->delta * Scale_coord;
+            float step_coord = mandelbrot_struct->delta * Scale_coord;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                mandelbrot_struct->start_y += -scale_cf;
+                mandelbrot_struct->start_y += -step_coord;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                mandelbrot_struct->start_y += scale_cf;    
+                mandelbrot_struct->start_y += step_coord;    
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                mandelbrot_struct->start_x += -scale_cf;
+                mandelbrot_struct->start_x += -step_coord;
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                mandelbrot_struct->start_x += scale_cf;  
+                mandelbrot_struct->start_x += step_coord;  
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
                 MoveCoord(mandelbrot_struct, ZOOM);
@@ -75,7 +75,8 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
                 MoveCoord(mandelbrot_struct, UNZOOM);
         }
 
-        MandelbrotCalc(mandelbrot_struct); 
+        for (size_t id = 0; id < Accuracy; id++)
+            MandelbrotCalc(mandelbrot_struct); 
 
         if (flag_draw_img)
         {
@@ -88,7 +89,11 @@ int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
             window.display();
         }
 
-        PrintFPS(&window, &fps_time, &frame_cnt);
+        float cur_fps = GetFPS(&window, &fps_time, &frame_cnt);
+
+        char buf[Buffer] = {0};
+        sprintf(buf, "%.2f FPS", cur_fps * Accuracy);
+        window.setTitle(buf);
     }
  
     
@@ -152,7 +157,7 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
     const __m256 Rmax2_  = _mm256_set1_ps(Rmax * Rmax);
     const __m256 Delta_  = _mm256_set1_ps(delta);
     const __m256 It_     = _mm256_set_ps (7 * delta, 6 * delta, 5 * delta, 4 * delta, 
-                                          3 * delta, 2 * delta, 1 *  delta, 0);
+                                          3 * delta, 2 * delta, 1 * delta, 0);
 
 	for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
     {
@@ -186,7 +191,7 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
                 y_ = _mm256_add_ps(_mm256_add_ps(xy_, xy_), y0_);
             }
 
-            cnt_ = _mm256_sub_epi32(cnt_, _mm256_set1_epi32(255));
+            cnt_ = _mm256_sub_epi32(cnt_, _mm256_set1_epi32(Counter_limit));
 
             uint32_t id = yi * mandelbrot_struct->width + xi;
             _mm256_storeu_si256((__m256i*)(mandelbrot_struct->exit_num + id), cnt_);
@@ -227,7 +232,6 @@ static void MandelbrotGetImage (const Mandelbrot_struct *mandelbrot_struct, sf::
                 img->setPixel(xi, yi, sf::Color((uint8_t)(Red_cf   * cnt + Red_offset), 
                                                 (uint8_t)(Green_cf * cnt + Green_offset), 
                                                 (uint8_t)(Blue_cf  * cnt + Blue_offset)));
-
         }
     }
 
@@ -242,7 +246,7 @@ static void MoveCoord (Mandelbrot_struct *mandelbrot_struct, const int mode)
 
     float dir = 0.f;
 
-    float scale_cf  = mandelbrot_struct->delta * Scale_delta;
+    float step_coord  = mandelbrot_struct->delta * Scale_delta;
 
     if (mandelbrot_struct->delta > 0 && !IsZero(mandelbrot_struct->delta))
     {
@@ -255,7 +259,7 @@ static void MoveCoord (Mandelbrot_struct *mandelbrot_struct, const int mode)
     if (mode == UNZOOM && IsZero(mandelbrot_struct->delta))
         dir = -1.f;
 
-    mandelbrot_struct->delta   +=      -scale_cf * dir;
+    mandelbrot_struct->delta   -=       step_coord * dir;
     
     mandelbrot_struct->start_x +=       Scale_coord * mandelbrot_struct->delta * dir;
     mandelbrot_struct->start_y +=       Scale_coord * mandelbrot_struct->delta * dir;

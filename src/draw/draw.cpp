@@ -23,7 +23,7 @@ void DrawImage (sf::RenderWindow *window, const sf::Image *img)
 
 //===========================================================================================
  
-void PrintFPS (sf::RenderWindow *window, sf::Clock *fps_time, size_t *frame_cnt)
+float GetFPS (sf::RenderWindow *window, sf::Clock *fps_time, size_t *frame_cnt)
 {
     assert (window      != nullptr && "window is nullptr");
     assert (fps_time    != nullptr && "fps_time is nullptr");
@@ -39,13 +39,7 @@ void PrintFPS (sf::RenderWindow *window, sf::Clock *fps_time, size_t *frame_cnt)
         *frame_cnt = 0;
     }
 
-
-    char buf[Buffer] = {0};
-    sprintf(buf, "%.2f FPS", fps);
-    
-    (*window).setTitle(buf);
-
-    return;
+    return fps;
 }
 
 //===========================================================================================
