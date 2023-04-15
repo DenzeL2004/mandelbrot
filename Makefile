@@ -17,7 +17,7 @@ obj/main.o: main.cpp
 		g++ main.cpp -c -o obj/main.o $(FLAGS)
 
 
-obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp  
+obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp mandelbrot/config.h
 				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o -O2 -mavx2 -msse4 $(FLAGS)
 
 

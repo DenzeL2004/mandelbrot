@@ -6,6 +6,8 @@
 
 #include <immintrin.h>
 
+#include "config.h"
+
 //===============================================================================
 
 const float Rmax = 5.0f;             
@@ -23,8 +25,6 @@ const float Scale_delta = 0.02f;
 
 const uint32_t Window_hight  = 800;
 const uint32_t Window_width  = 1200;
-
-const size_t   Accuracy = 100;
 
 //===============================================================================
 

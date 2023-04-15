@@ -150,6 +150,9 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
 {
     assert(mandelbrot_struct != nullptr && "mandelbrot_struct is nullptr");
 
+
+    #ifdef OPTIMIZE
+
     float start_x = mandelbrot_struct->start_x;
     float start_y = mandelbrot_struct->start_y;
     float delta   = mandelbrot_struct->delta;
@@ -199,6 +202,40 @@ static void MandelbrotCalc (Mandelbrot_struct *mandelbrot_struct)
             x0_= _mm256_add_ps(x0_, _mm256_mul_ps(Delta_, _mm256_set1_ps(8)));
         }
     }
+
+    #else
+
+    for (uint32_t yi = 0; yi < mandelbrot_struct->hight; yi++) 
+    {
+        float x0 = mandelbrot_struct->start_x;
+		float y0 = mandelbrot_struct->start_y + ((float)yi) * mandelbrot_struct->delta;
+        
+        for (uint32_t xi = 0; xi < mandelbrot_struct->width; xi++, x0 += mandelbrot_struct->delta) 
+        {
+            float x  = x0;
+            float y  = y0;
+            
+            size_t cnt = 0;
+
+            for (; cnt < Counter_limit; cnt++) 
+            {
+                float x2 = x * x;
+                float y2 = y * y;
+
+                float mul_xy = x * y;
+
+                if (x2 + y2 > Rmax) break;
+
+                x = x2 - y2     + x0;
+                y = 2  * mul_xy + y0;
+            }
+
+            size_t id = yi * mandelbrot_struct->width + xi;
+            *(mandelbrot_struct->exit_num + id) = (int)cnt;
+        }
+    }
+
+    #endif
 
     return;
 }
