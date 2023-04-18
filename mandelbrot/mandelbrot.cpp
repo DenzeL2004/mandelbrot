@@ -25,7 +25,7 @@ static void MoveCoord (Mandelbrot_struct *mandelbrot_struct, const int mode);
 
 int MandelbrotExe(Mandelbrot_struct *mandelbrot_struct)
 {
-    assert (mandelbrot_struct != nullptr && "mandelbrot is nullptr");
+    assert (mandelbrot_struct != nullptr && "mandelbrot struct is nullptr");
 
     sf::RenderWindow window(sf::VideoMode(Window_width, Window_hight), "Mandelbrot");
 
