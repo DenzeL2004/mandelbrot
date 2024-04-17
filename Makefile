@@ -1,4 +1,4 @@
-all: mkdirectory run optimization
+COMPILER = g++
 
 FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations 		\
 		-Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion	\
@@ -7,37 +7,29 @@ FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equa
 		-Wtype-limits -Wwrite-strings -D_DEBUG -D_EJUDGE_CLIENT_SIDE
 
 SFML_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+OPTIMIZATION_FLAGS = -O2 -mavx2 -msse4
 
+TASK_NAME = mandelbrot
 
-run: 	 obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o
-	g++  obj/generals.o obj/log_errors.o obj/mandelbrot.o obj/main.o obj/draw.o -o run  $(SFML_FLAGS)
+OBJ_DIR = ./obj
+SRC_DIR = ./src
 
+CPP := $(shell find $(SRC_DIR) -type f -name "*.cpp")
+OBJ = $(CPP:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-obj/main.o: main.cpp
-		g++ main.cpp -c -o obj/main.o $(FLAGS)
+all : build 
 
+.PHONY : build
+build : $(TASK_NAME)
 
-obj/mandelbrot.o: 	mandelbrot/mandelbrot.h mandelbrot/mandelbrot.cpp mandelbrot/config.h
-				g++ mandelbrot/mandelbrot.cpp -c -o obj/mandelbrot.o -O2 -mavx2 -msse4 $(FLAGS)
+$(TASK_NAME) : $(OBJ) 
+	@ mkdir -p $(@D)
+	@$(COMPILER) $(FLAGS) $(OPTIMIZATION_FLAGS) $(OBJ) -o $(TASK_NAME) $(SFML_FLAGS)
 
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
+	@$(COMPILER) $(FLAGS) $(OPTIMIZATION_FLAGS)  $(SFML_FLAGS) -c $< -o $@
 
-obj/log_errors.o: src/log_info/log_errors.h src/log_info/log_errors.cpp
-			  g++ src/log_info/log_errors.cpp -c -o obj/log_errors.o $(FLAGS)
-
-obj/generals.o: src/generals_func/generals.cpp src/generals_func/generals.h
-			g++ src/generals_func/generals.cpp -c -o obj/generals.o $(FLAGS)
-
-
-obj/draw.o: src/draw/draw.cpp src/draw/draw.h
-		g++ src/draw/draw.cpp -c -o obj/draw.o $(FLAGS)
-
-
-.PHONY: cleanup mkdirectory
-
-mkdirectory:
-	mkdir -p obj;
-	mkdir -p temp;
-	
-
-cleanup:
-	rm obj/*.o
+.PHONY : cleanup
+cleanup :
+	@rm -rf $(TASK_NAME) $(OBJ_DIR)
